@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ua">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../node_modules/bootstrap/dist/css/bootstrap.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"
+    />
+    <link rel="stylesheet" href="form.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <title>Form</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Анкета</h1>
+      <p>Привіт! Це анкета на отримку гуманітарної допомоги для дітей з України, чиї сім'ї опинилися у складній ситуації після 24 лютого.</p>
+      <p>Ми надаємо базову допомогу - харчування для дітей.</p>
+      <p>Заповни анкету, щоб попросити про допомогу. Після заповнення з тобою зв'яжеться волонтер Cuddle Bear.</p>
+      <p>Інструкція для допомоги у заповненні анкети шукай на нашій сторінці.</p>
+      <p>УВАГА!</p>
+      <p>Після заповнення, тобі необхідно "вийти з нами на зв'язок". Для цього ти маєш  залишити повідомлення про заповнення анкети, вказавши ім'я на яке вона була оформлена. Це можна зробити:</p>
+      <ol>
+        <li>надіславши повідомлення до чату з нашими волонтерами, телеграм боту MamaBearSupportBot , наприклад "Анкету відправлено. Олена Зеленська!" Обов'язково вкажіть ім'я те саме, що ви вказали в анкеті!</li>
+        <li>надіславши нам повідомлення на нашу сторінку у  Фейсбук чи Інстаграм - @cuddlebear.org. Ти обов'язково маєш стати друзями з нашою сторінкою, щоб повідомлення не загубилося у діректі.</li>
+      </ol>
+      <p>Ми хочемо, щоб допомга в першу чергу потрапила тим, хто потребує її найбільше. Тому умови отримання допомоги змінюються регулярно в залежності від наявної допомоги у штабі і кількості сімей, яким ми можемо допомогти на данний момент.</p>
+      <p>Якщо анкета не повна, немає документів і ти не вийшов на зв'язок - анкeту не буде розглянуто.</p>
+      <div class="form-check">
+        <input class="form-check-input controller-checkbox" type="checkbox" value="shippingAgreement" id="shippingAgreement">
+        <label class="form-check-label" for="shippingAgreement">Матиму змогу оплатити доставку гуманітарного відправлення</label>
+      </div>
+      <form id="form" onsubmit="submitForm();" novalidate>
+        <div class="mb-3">
+          <label for="creds" class="form-label">ПІБ<span class="required">*</span></label>
+          <input type="text" class="form-control controller" id="creds" placeholder="Зеленський Володимир Олександрович" onchange="moveValue(event, 'delivery-creds')" required>
+        </div>
+        <div class="mb-3">
+          <label for="phoneNumber" class="form-label">Номер телефону<span class="required">*</span></label>
+          <div class="phone-container">
+            <input type="tel" class="form-control controller" id="phoneNumber" maxlength="10" onchange="moveValue(event, 'delivery-number')" required>
+            <button class="btn btn-primary" onclick="process(event)">Перевірити</button>
+          </div>
+          <div class="alert alert-info" style="display: none;"></div>
+        </div>
+        <div class="mb-3">
+          <label for="residence" class="form-label">Місце прописки<span class="required">*</span></label>
+          <input type="text" class="form-control controller" id="residence" placeholder="Область, місто" required>
+        </div>
+        <div class="mb-3">
+          <label>Місце проживання (на даний момент)<span class="required">*</span></label>
+          <div class="input-group mb-3 residence-group">
+            <button class="btn btn-outline-secondary" type="button" onclick="checkResidence(event, true)" id="home-residence-btn">по прописці</button>
+            <button class="btn btn-outline-secondary" type="button" onclick="checkResidence(event, false)" id="new-residence-btn">переїхали</button>
+            <input type="text" class="form-control controller" placeholder="Область, місто" aria-label="Область, місто, країна" id="new-residence-input" required>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="family" class="form-label">Вкажіть кількість осіб в сім'ї<span class="required">*</span></label>
+          <input type="number" class="form-control controller" id="family" placeholder="" required>
+        </div>
+        <div class="mb-3">
+          <label>Вкажіть кількість дітей</label>
+          <select class="form-select controller" aria-label="kids" onchange="generateElements(event)">
+            <option value='' selected>--</option>
+            <option value=1>1</option>
+            <option value=2>2</option>
+            <option value=3>3</option>
+            <option value=4>4</option>
+            <option value=5>5</option>
+            <option value=6>6</option>
+            <option value=7>7</option>
+            <option value=8>8</option>
+            <option value=9>9</option>
+          </select>
+          <div class="kids"></div>
+        </div>
+        <div class="mb-3">
+          <label>Вкажіть соцмережі для зворотнього зв'язку</label>
+          <div class="social-networks">
+            <div class="form-check">
+              <input class="form-check-input controller-social-network-checkbox" type="checkbox" value="telegram" id="tg" onchange="checkCheckBox(event)">
+              <label class="form-check-label" for="tg">Telegram</label>
+              <input class="form-control controller" type="text" placeholder="нікнейм/номер телефону" id="tg-input" style="display: none">
+            </div>
+            <div class="form-check">
+              <input class="form-check-input controller-social-network-checkbox" type="checkbox" value="viber" id="vb" onchange="checkCheckBox(event)">
+              <label class="form-check-label" for="vb">Viber</label>
+              <input class="form-control controller" type="text" placeholder="нікнейм/номер телефону" id="vb-input" style="display: none">
+            </div>
+            <div class="form-check">
+              <input class="form-check-input controller-social-network-checkbox" type="checkbox" value="whatsapp" id="wa" onchange="checkCheckBox(event)">
+              <label class="form-check-label" for="wa">Whats App</label>
+              <input class="form-control controller" type="text" placeholder="нікнейм/номер телефону" id="wa-input" style="display: none">
+            </div>
+            <div class="form-check">
+              <input class="form-check-input controller-social-network-checkbox" type="checkbox" value="facebook" id="fb" onchange="checkCheckBox(event)">
+              <label class="form-check-label" for="fb">Facebook Messenger</label>
+              <input class="form-control controller" type="text" placeholder="нікнейм/номер телефону" id="fb-input" style="display: none">
+            </div>
+            <div class="form-check">
+              <input class="form-check-input controller-social-network-checkbox" type="checkbox" value="instagram" id="ig" onchange="checkCheckBox(event)">
+              <label class="form-check-label" for="ig">Instagram</label>
+              <input class="form-control controller" type="text" placeholder="нікнейм/номер телефону" id="ig-input" style="display: none">
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-check-label">Яку допомогу потребуєте для дитини?</label>
+          <div class="kids-help">
+            <div class="form-check">
+              <input class="form-check-input controller-kids-help-checkbox" type="checkbox" value="diapers" id="dp" onchange="checkCheckBox(event)">
+              <label class="form-check-label" for="dp">Підгузники</label>
+              <input class="form-control controller" type="text" placeholder="Розмір" id="dp-input" style="display: none">
+            </div>
+            <div class="form-check">
+              <input class="form-check-input controller-kids-help-checkbox" type="checkbox" value="babyFood" id="bf">
+              <label class="form-check-label" for="bf">Дитяче харчування</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input controller-kids-help-checkbox" type="checkbox" value="babyUtensils" id="bt">
+              <label class="form-check-label" for="bt">Дитячий посуд</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input controller-kids-help-checkbox" type="checkbox" value="clothes" id="cl" onchange="checkCheckBox(event)">
+              <label class="form-check-label" for="cl">Одяг</label>
+              <input class="form-control controller" type="text" placeholder="Розмір" id="cl-input" style="display: none">
+            </div>
+            <div class="form-check">
+              <input class="form-check-input controller-kids-help-checkbox" type="checkbox" value="shoes" id="sh" onchange="checkCheckBox(event)">
+              <label class="form-check-label" for="sh">Взуття</label>
+              <input class="form-control controller" type="text" placeholder="Розмір" id="sh-input" style="display: none">
+            </div>
+            <div class="form-check">
+              <input class="form-check-input controller-kids-help-checkbox" type="checkbox" value="hygiene" id="hg">
+              <label class="form-check-label" for="hg">Засоби гігієни</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input controller-kids-help-checkbox" type="checkbox" value="rug" id="rg">
+              <label class="form-check-label" for="rg">Пледи</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input controller-kids-help-checkbox" type="checkbox" value="toys" id="ts">
+              <label class="form-check-label" for="ts">Іграшки</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input controller-kids-help-checkbox" type="checkbox" value="other" id="th" onchange="checkCheckBox(event)">
+              <label class="form-check-label" for="th">Інше</label>
+              <input class="form-control controller" type="text" id="th-input" style="display: none">
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="help-for-adults" class="form-label">Яку допомогу потребуєте для дорослих?</label>
+          <textarea class="form-control controller" id="help-for-adults" rows="3" placeholder="Засоби гігієни, взуття, одяг, продукти харчування..."></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="history" class="form-label">Що у Вас змінилось від початку війни?</label>
+          <textarea class="form-control controller" id="history" rows="2" placeholder="Наша сім'я працювала у місті Київ. Мій чоловік працював..."></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Контакти для доставки<span class="required">*</span></label>
+          <div class="delivery">
+            <div class="row g-5 align-items-center">
+              <div class="col-3">
+                <label for="delivery-creds" class="form-label">Ім'я та прізвище<span class="required">*</span></label>
+              </div>
+              <div class="col-9">
+                <input type="text" class="form-control controller" id="delivery-creds" placeholder="Ім'я та прізвище" required>
+              </div>
+            </div>
+            <div class="row g-5 align-items-center">
+              <div class="col-3">
+                <label for="delivery-number" class="form-label">Номер телефону<span class="required">*</span></label>
+              </div>
+              <div class="col-9">
+                <input type="text" class="form-control controller" id="delivery-number" placeholder="Номер телефону" required>
+              </div>
+            </div>
+            <div class="row g-5 align-items-center">
+              <div class="col-3">
+                <label for="delivery-city" class="form-label">Місто<span class="required">*</span></label>
+              </div>
+              <div class="col-9">
+                <input type="text" class="form-control controller" id="delivery-city" placeholder="Місто" required>
+              </div>
+            </div>
+            <div class="row g-5 align-items-center">
+              <div class="col-3">
+                <label for="delivery-branch-np" class="form-label">Номер відділення НП<span class="required">*</span></label>
+              </div>
+              <div class="col-9">
+                <input type="text" class="form-control controller" id="delivery-branch-np" placeholder="Номер відділення НП" required>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="feedback" class="form-label">Звідки дізнались про нас</label>
+          <input type="text" class="form-control controller" id="feedback">
+        </div>
+        <div class="mb-3 d-flex justify-content-end">
+          <input class="btn btn-outline-primary btn-custom" type="reset" value="Очистити" onclick="onClear()">
+          <input class="btn btn-primary" type="button" onclick="submitForm(event)" value="Надіслати">
+        </div>
+      </form>
+    </div>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script src="form.js"></script>
+  </body>
+</html>

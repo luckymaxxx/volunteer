@@ -1,0 +1,22 @@
+{
+  "name": "volunteer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luckymaxxx/volunteer.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/luckymaxxx/volunteer/issues"
+  },
+  "homepage": "https://github.com/luckymaxxx/volunteer#readme",
+  "dependencies": {
+    "bootstrap": "^5.2.0-beta1"
+  }
+}

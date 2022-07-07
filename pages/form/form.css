@@ -1,0 +1,44 @@
+.phone-container {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.iti {
+    flex-grow: 2;
+    margin-right: 5px;
+}
+
+.active-residence {
+    color: #fff;
+    background-color: #6c757d;
+}
+
+.iti__country-list {
+    z-index: 10;
+}
+
+.kids,
+.delivery,
+.social-networks,
+.kids-help {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.kids-fieldset {
+    display: flex;
+}
+
+.kids-fieldset-sex,
+.kids-fieldset-age {
+    flex-grow: 1;
+    margin: 10px;
+}
+
+.required {
+    color: red;
+}
+
+.btn-custom {
+    margin-right: 5px;
+}
